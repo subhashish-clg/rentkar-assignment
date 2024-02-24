@@ -1,4 +1,4 @@
-import { ITodo, fetchAllTodos, markTodo } from "../state/slices/TodoSlicer";
+import { ITodo, fetchAllTodos, markTodo } from "../state/slices/TodoSlice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../state/store";
 

@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { addTodo, fetchAllTodos } from "../state/slices/TodoSlicer";
+import { addTodo, fetchAllTodos } from "../state/slices/TodoSlice";
 import { useRef } from "react";
 import { AppDispatch } from "../state/store";
 
@@ -38,8 +38,9 @@ export default function TodoInputForm() {
           name="title"
           ref={titleRef}
           placeholder="Add a Todo"
+          required
         />
-        <button className="bg-green-400 p-2 rounded disabled:opacity-45">
+        <button className="bg-green-400 p-2 rounded disabled:opacity-45 hover:bg-green-500">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

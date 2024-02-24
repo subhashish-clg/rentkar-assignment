@@ -17,7 +17,9 @@ export interface TodoState {
 }
 
 export const fetchAllTodos = createAsyncThunk("todos/fetchAll", async () => {
-  const response = await axios.get<ITodo[]>("http://localhost:8080/todos");
+  const response = await axios.get<ITodo[]>(
+    `${import.meta.env.VITE_SERVER_URL}/todos`
+  );
 
   return response.data;
 });
@@ -25,7 +27,11 @@ export const fetchAllTodos = createAsyncThunk("todos/fetchAll", async () => {
 export const addTodo = createAsyncThunk(
   "todos/add",
   async (todo: Partial<ITodo>) => {
-    const response = await axios.post("http://localhost:8080/todos", todo);
+    console.log(import.meta.env.VITE_SERVER_URL);
+    const response = await axios.post(
+      `${import.meta.env.VITE_SERVER_URL}/todos`,
+      todo
+    );
 
     return response.data;
   }
@@ -34,7 +40,9 @@ export const addTodo = createAsyncThunk(
 export const deleteTodo = createAsyncThunk(
   "todos/delete",
   async (id: string) => {
-    const response = await axios.delete(`http://localhost:8080/todos/${id}`);
+    const response = await axios.delete(
+      `${import.meta.env.VITE_SERVER_URL}/todos/${id}`
+    );
 
     return response.data;
   }
@@ -44,9 +52,12 @@ export const markTodo = createAsyncThunk(
   "todos/mark",
   async ({ id, status }: { id: string; status: boolean }) => {
     console.log(status);
-    const response = await axios.patch(`http://localhost:8080/todos/${id}`, {
-      status: status,
-    });
+    const response = await axios.patch(
+      `${import.meta.env.VITE_SERVER_URL}/todos/${id}`,
+      {
+        status: status,
+      }
+    );
 
     return response.data;
   }
@@ -72,33 +83,23 @@ export const todosSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(
-      fetchAllTodos.fulfilled,
-      (state, action: PayloadAction<ITodo[]>) => {
-        state.todos = [...action.payload];
-      }
-    );
+    builder
+      .addCase(
+        fetchAllTodos.fulfilled,
+        (state, action: PayloadAction<ITodo[]>) => {
+          state.todos = [...action.payload];
+          state.isLoading = false;
+        }
+      )
+      .addCase(fetchAllTodos.pending, (state) => {
+        state.isLoading = true;
+      });
 
-    builder.addCase(
-      addTodo.fulfilled,
-      (state, action: PayloadAction<{ status: string; message: string }>) => {
-        console.log(action.payload);
-      }
-    );
+    builder.addCase(addTodo.fulfilled, () => {});
 
-    builder.addCase(
-      markTodo.fulfilled,
-      (state, action: PayloadAction<{ status: string; message: string }>) => {
-        console.log(action.payload);
-      }
-    );
+    builder.addCase(markTodo.fulfilled, () => {});
 
-    builder.addCase(
-      deleteTodo.fulfilled,
-      (state, action: PayloadAction<{ status: string; message: string }>) => {
-        console.log(action.payload);
-      }
-    );
+    builder.addCase(deleteTodo.fulfilled, () => {});
   },
 });
 
