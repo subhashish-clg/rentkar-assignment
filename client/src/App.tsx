@@ -3,7 +3,13 @@ import { AppDispatch, RootState } from "./state/store";
 import TodoInputForm from "./components/TodoInputForm";
 import Todo from "./components/Todo";
 import { useEffect, useState } from "react";
-import { deleteTodo, fetchAllTodos } from "./state/slices/TodoSlice";
+import {
+  deleteTodo,
+  refreshTodos,
+} from "./state/slices/TodoSlice";
+import { ToastContainer } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
 
 export default function App() {
   const todosState = useSelector((state: RootState) => state.todos);
@@ -17,18 +23,23 @@ export default function App() {
 
     console.log(todosState.todos.filter((todo) => todo.isDone));
 
-    todosState.todos
-      .filter((todo) => todo.isDone)
-      .forEach(async (todo) => {
-        await dispatch(deleteTodo(todo._id));
-      });
+    await Promise.all(
+      todosState.todos
+        .filter((todo) => todo.isDone)
+        .map(async (todo) => {
+          return dispatch(deleteTodo(todo._id));
+        })
+    );
 
-    await dispatch(fetchAllTodos());
+    await dispatch(refreshTodos());
   };
 
   useEffect(() => {
-    dispatch(fetchAllTodos());
+    const promise = dispatch(refreshTodos());
+
+    return () => promise.abort();
   }, []);
+
   return (
     <>
       <main className="container mx-auto h-screen  flex justify-center items-start">
@@ -69,7 +80,9 @@ export default function App() {
             </button>
           </div>
           <div className="mt-6 space-y-2 flex-1 overflow-y-auto">
-            {todosState.todos.length > 0 ? (
+            {todosState.isLoading && !todosState.initialized && "Loading"}
+            {todosState.initialized && todosState.todos.length === 0 && <p>Please add a TODO.</p>}
+            {todosState.todos.length > 0 && (
               todosState.todos.map((todo) => {
                 if (
                   searchQuery &&
@@ -81,13 +94,12 @@ export default function App() {
                 }
                 return <Todo key={todo._id} todo={todo} />;
               })
-            ) : (
-              <p>Add Todos to continue</p>
             )}
           </div>
           <TodoInputForm />
         </div>
       </main>
+      <ToastContainer />
     </>
   );
 }

@@ -1,9 +1,10 @@
-import { useDispatch } from "react-redux";
-import { addTodo, fetchAllTodos } from "../state/slices/TodoSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { addTodo, refreshTodos } from "../state/slices/TodoSlice";
 import { useRef } from "react";
-import { AppDispatch } from "../state/store";
+import { AppDispatch, RootState } from "../state/store";
 
 export default function TodoInputForm() {
+  const isLoading = useSelector((state:RootState) => state.todos.isLoading)
   const dispatch = useDispatch<AppDispatch>();
 
   const titleRef = useRef<HTMLInputElement>(null);
@@ -17,7 +18,7 @@ export default function TodoInputForm() {
         addTodo({ title: titleRef.current.value, body: titleRef.current.value })
       );
 
-      await dispatch(fetchAllTodos())
+      await dispatch(refreshTodos())
 
 
       titleRef.current.disabled = false;
@@ -29,7 +30,7 @@ export default function TodoInputForm() {
   return (
     <div>
       <form
-        className="flex justify-center items-center gap-3"
+        className={`flex justify-center items-center gap-3 ${isLoading && "opacity-50"}`}
         onSubmit={handleSumbit}
       >
         <input
