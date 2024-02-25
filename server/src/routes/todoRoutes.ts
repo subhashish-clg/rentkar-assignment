@@ -33,6 +33,8 @@ todosRouter.patch("/:id", async (req, res) => {
       isDone: boolean
     };
 
+    console.log(body)
+
     const todo = await TodoModel.findByIdAndUpdate(id, {
       ...body
     });

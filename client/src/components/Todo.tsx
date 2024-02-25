@@ -4,8 +4,10 @@ import { AppDispatch } from "../state/store";
 import { useRef, useState } from "react";
 
 export default function Todo(props: { todo: ITodo }) {
-  const todoTextRef = useRef<HTMLInputElement>(null)
+  const todoTextRef = useRef<HTMLTextAreaElement>(null);
+  const [todoTitle, setTodoTitle] = useState<string>(props.todo.title);
   const [checked, setChecked] = useState<boolean>(props.todo.isDone);
+
   const dispatch = useDispatch<AppDispatch>();
   const handleDone: React.ChangeEventHandler<HTMLInputElement> = async (e) => {
     e.preventDefault();
@@ -27,27 +29,41 @@ export default function Todo(props: { todo: ITodo }) {
     e
   ) => {
     e.preventDefault();
+    if (todoTextRef.current) {
+      await dispatch(
+        updateTodo({
+          ...props.todo,
+          title: todoTextRef.current.value,
+        })
+      );
 
-    await Promise.all( [updateTodo(
-      {
-        ...props.todo,
-        title: todoTextRef.current ? todoTextRef.current.value : props.todo.title
-      }
-    ), dispatch(refreshTodos())])
+      todoTextRef.current.blur();
+    }
+    await dispatch(refreshTodos());
   };
   return (
     <div
-      className={`bg-white px-4 py-4 rounded-md hover:shadow-lg transition-all ease-linear flex justify-between items-center gap-8 `}
+      className={`bg-white px-4 py-4 rounded-md hover:shadow-lg transition-all ease-linear flex justify-between items-center gap-2 `}
     >
-      <form onSubmit={handleTodoUpdate}>
-        <input
-          type="text"
-          className={` ${checked && "opacity-50 line-through"} `}
+      <form onSubmit={handleTodoUpdate} className="flex-1 group">
+        <textarea
+          className={` ${
+            checked && "opacity-50 line-through"
+          } border-0 w-full  h-fit`}
+          wrap="hard"
           ref={todoTextRef}
           disabled={checked}
-          // className="outline-none border-0 flex-1"
-          defaultValue={props.todo.title}
-        />
+ 
+          value={todoTitle}
+          onChange={(e) => setTodoTitle(e.target.value)}
+        ></textarea>
+
+        <button
+          disabled={checked}
+          className="hidden group-focus-within:block bg-green-500 text-white mt-4 px-4 py-1 rounded-full disabled:bg-gray-100"
+        >
+          Update
+        </button>
       </form>
       <div>
         <input

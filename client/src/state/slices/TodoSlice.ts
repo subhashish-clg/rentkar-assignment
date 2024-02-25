@@ -30,7 +30,7 @@ export const fetchAllTodos = createAsyncThunk("todos/fetchAll", async () => {
 export const refreshTodos = createAsyncThunk("todos/refresh", async () => {
   const response = await axios.get<ITodo[]>(
     `${import.meta.env.VITE_SERVER_URL}/todos`,
-    { timeout: 5000 }
+    { timeout: 50000 }
   );
 
   return response.data;
@@ -61,12 +61,12 @@ export const deleteTodo = createAsyncThunk(
 );
 
 export const updateTodo = createAsyncThunk(
-  "todos/mark",
+  "todos/update",
   async (todo: ITodo) => {
-    console.log(status);
+    console.log(todo);
     const response = await axios.patch(
       `${import.meta.env.VITE_SERVER_URL}/todos/${todo._id}`,
-      todo
+      {...todo}
     );
 
     return response.data;
