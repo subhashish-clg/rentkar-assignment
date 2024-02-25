@@ -1,6 +1,10 @@
 import express from "express";
 import TodoModel from "../models/Todo";
 
+export interface ITodo {
+
+}
+
 const todosRouter = express.Router();
 
 // Return all the TODOs from the database
@@ -23,13 +27,17 @@ todosRouter.get("/", async (req, res) => {
 todosRouter.patch("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body as { status: boolean };
+    const body = req.body as {
+      title: string,
+      body:string,
+      isDone: boolean
+    };
 
     const todo = await TodoModel.findByIdAndUpdate(id, {
-      isDone: status,
+      ...body
     });
 
-    console.log(status);
+    
 
     res.send({
       status: "success",

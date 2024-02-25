@@ -60,15 +60,13 @@ export const deleteTodo = createAsyncThunk(
   }
 );
 
-export const markTodo = createAsyncThunk(
+export const updateTodo = createAsyncThunk(
   "todos/mark",
-  async ({ id, status }: { id: string; status: boolean }) => {
+  async (todo: ITodo) => {
     console.log(status);
     const response = await axios.patch(
-      `${import.meta.env.VITE_SERVER_URL}/todos/${id}`,
-      {
-        status: status,
-      }
+      `${import.meta.env.VITE_SERVER_URL}/todos/${todo._id}`,
+      todo
     );
 
     return response.data;
@@ -86,7 +84,7 @@ export const todosSlice = createSlice({
   name: "todos",
   initialState,
   reducers: {
-    markTodo: (state, action: PayloadAction<string>) => {
+    updateTodo: (state, action: PayloadAction<string>) => {
       const indexToBeUpdated = state.todos.findIndex(
         (todo) => todo._id === action.payload
       );
@@ -166,7 +164,7 @@ export const todosSlice = createSlice({
         toast.error("Failed to sync.");
       });
 
-    builder.addCase(markTodo.fulfilled, () => {});
+    builder.addCase(updateTodo.fulfilled, () => {});
 
     builder.addCase(deleteTodo.fulfilled, () => {});
   },
