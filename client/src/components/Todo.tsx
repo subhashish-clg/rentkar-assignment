@@ -1,4 +1,9 @@
-import { ITodo, refreshTodos, updateTodo } from "../state/slices/TodoSlice";
+import {
+  ITodo,
+  deleteTodo,
+  refreshTodos,
+  updateTodo,
+} from "../state/slices/TodoSlice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../state/store";
 import { useRef, useState } from "react";
@@ -53,17 +58,26 @@ export default function Todo(props: { todo: ITodo }) {
           wrap="hard"
           ref={todoTextRef}
           disabled={checked}
- 
           value={todoTitle}
           onChange={(e) => setTodoTitle(e.target.value)}
         ></textarea>
-
-        <button
-          disabled={checked}
-          className="hidden group-focus-within:block bg-green-500 text-white mt-4 px-4 py-1 rounded-full disabled:bg-gray-100"
-        >
-          Update
-        </button>
+        <div className="flex gap-4">
+          <button
+            disabled={checked}
+            className=" bg-gray-500 group-focus-within:bg-green-500 text-white mt-4 px-4 py-1 rounded-full  disabled:bg-gray-500 transition-colors ease-linear"
+          >
+            Update
+          </button>
+          <button
+            onClick={async () => {
+              await dispatch(deleteTodo(props.todo._id));
+              await dispatch(refreshTodos());
+            }}
+            className="bg-red-500 text-white mt-4 px-4 py-1 rounded-full disabled:bg-gray-100"
+          >
+            Delete
+          </button>
+        </div>
       </form>
       <div>
         <input
